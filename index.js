@@ -9,14 +9,14 @@ const app = express();
 const PORT = 5000 || process.env.PORT;
 
 // CORS Configuration
-app.set("trst proxy", 1);
+app.set("trust proxy", 1);
 app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-// connectDB();
+connectDB();
 
 // Routes
 app.use("/", (req, res) => {
