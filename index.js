@@ -4,6 +4,8 @@ const express = require("express");
 const connectDB = require("./server/config/dbConfig");
 const cors = require("cors");
 
+const authRoutes = require("./server/routers/authRoutes");
+
 // Make APP
 const app = express();
 const PORT = 5000 || process.env.PORT;
@@ -19,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 // Routes
+app.use("/api/auth", authRoutes);
+
 app.use("/", (req, res) => {
     res.status(200).json({
         message: "Hello API",
