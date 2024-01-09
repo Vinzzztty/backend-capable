@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./server/config/dbConfig");
 const cors = require("cors");
+const functions = require("firebase-functions");
 
 const authRoutes = require("./server/routers/authRoutes");
 
@@ -39,3 +40,5 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+exports.api = functions.https.onRequest(app);
