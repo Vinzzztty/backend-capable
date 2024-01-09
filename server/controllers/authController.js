@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Teacher = require("../models/Teacher");
+const bcryptjs = require("bcryptjs");
 const {
     signAccessToken,
     verifyAccessToken,
@@ -26,10 +27,12 @@ exports.signup = async (req, res) => {
 
         const model = role === "user" ? User : Teacher;
 
+        const hashPassword = await bcryptjs.hash(password, 8);
+
         const newUser = new model({
             username,
             email,
-            password,
+            password: hashPassword,
         });
 
         await newUser.save();
@@ -59,7 +62,9 @@ exports.login = async (req, res) => {
             });
         }
 
-        if (user.password !== password) {
+        const isPasswordMatch = await bcryptjs.compare(password, user.password);
+
+        if (!isPasswordMatch) {
             return res.status(401).json({
                 message: "Invalid password",
             });
