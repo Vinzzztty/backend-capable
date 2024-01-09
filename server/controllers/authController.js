@@ -1,5 +1,9 @@
 const User = require("../models/User");
 const Teacher = require("../models/Teacher");
+const {
+    signAccessToken,
+    verifyAccessToken,
+} = require("../middleware/jwt_helper");
 
 exports.signup = async (req, res) => {
     try {
@@ -61,8 +65,41 @@ exports.login = async (req, res) => {
             });
         }
 
+        const accessToken = await signAccessToken(user._id);
+
         res.status(200).json({
             message: "Login Successfully",
+            token: accessToken,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "An unexpected error occured",
+            error: error.message,
+        });
+    }
+};
+
+exports.getUserDetails = async (req, res) => {
+    try {
+        verifyAccessToken(req, res, async (err) => {
+            if (err) {
+                return res.status(401).json({ error: "Unathorized" });
+            }
+
+            const userId = req.payload.aud;
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                return res.status(404).json({
+                    message: "user not found",
+                });
+            }
+
+            res.status(200).json({
+                status: "success",
+                data: user,
+            });
         });
     } catch (error) {
         res.status(500).json({
