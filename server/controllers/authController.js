@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Teacher = require("../models/Teacher");
 const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const {
     signAccessToken,
     verifyAccessToken,
@@ -125,6 +126,37 @@ exports.getUserDetails = async (req, res) => {
         res.status(500).json({
             message: "An unexpected error occured",
             error: error.message,
+        });
+    }
+};
+
+exports.logout = async (req, res) => {
+    try {
+        logoutUser(req, res);
+        res.status(200).json({
+            message: "User logged out successfully",
+            session: req.session,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: error.message,
+        });
+    } finally {
+        // Clear session data
+        req.session = null;
+    }
+};
+
+const logoutUser = (req, res, next) => {
+    const token = req.headers["authorization"];
+    if (token) {
+        jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
+            if (err) {
+                return err;
+            }
+
+            decoded.exp = Date.now();
         });
     }
 };
