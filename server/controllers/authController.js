@@ -36,6 +36,7 @@ exports.signup = async (req, res) => {
             username,
             email,
             password: hashPassword,
+            role: role,
         });
 
         await newUser.save();
