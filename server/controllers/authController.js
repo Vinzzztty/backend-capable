@@ -101,6 +101,37 @@ exports.login = async (req, res) => {
     }
 };
 
+exports.checkAccount = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Check in the User Collection
+        let user = await User.findOne({ email });
+
+        // If the user is not found in the User collection, check in the Teacher collection
+        if (!user) {
+            user = await Teacher.findOne({ email });
+
+            // If the user is not found in either collection, respond with an error
+            if (!user) {
+                return res.status(401).json({
+                    message: "Email not found",
+                });
+            }
+        }
+
+        res.status(200).json({
+            status: user.length === 1 ? "User exists" : "User does not exist",
+            userExists: user.length === 1,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "An unexpected error occured",
+            error: error.message,
+        });
+    }
+};
+
 exports.verify = async (req, res) => {
     const tokenHeaderKey = "jwt-token";
     const authToken = req.headers[tokenHeaderKey];
